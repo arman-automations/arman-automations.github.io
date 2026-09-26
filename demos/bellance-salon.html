@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bellance Salon — WhatsApp booking demo</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0b141a; font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 18px 12px; color: #e9edef; }
+  .demo-banner { max-width: 420px; width: 100%; background: #182229; border: 1px solid #2a3942; color: #aebac1; font-size: 13px; line-height: 1.5; padding: 10px 14px; border-radius: 10px; margin-bottom: 14px; text-align: center; }
+  .demo-banner b { color: #00a884; }
+  .phone { width: 400px; max-width: 96vw; height: 640px; max-height: 82vh; background: #0b141a; border-radius: 26px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 18px 60px rgba(0,0,0,.55); border: 1px solid #2a3942; }
+  .wa-header { background: #075E54; color: #fff; padding: 10px 12px; display: flex; align-items: center; gap: 10px; flex: none; }
+  .avatar { width: 40px; height: 40px; border-radius: 50%; background: #25D366; color: #062e1f; font-weight: 700; font-size: 15px; display: flex; align-items: center; justify-content: center; flex: none; }
+  .who { line-height: 1.25; }
+  .bname { font-size: 16px; font-weight: 600; }
+  .status { font-size: 12px; opacity: .85; }
+  .chat { flex: 1; background: #ECE5DD; padding: 12px 10px; overflow-y: auto; display: flex; flex-direction: column; }
+  .msg { max-width: 78%; padding: 8px 12px; border-radius: 8px; margin: 3px 0; font-size: 14px; line-height: 1.45; color: #111b21; box-shadow: 0 1px 1px rgba(0,0,0,.12); word-wrap: break-word; }
+  .msg.in { background: #ffffff; align-self: flex-start; border-top-left-radius: 0; }
+  .msg.out { background: #DCF8C6; align-self: flex-end; border-top-right-radius: 0; }
+  .msg.typing span { display: inline-block; width: 7px; height: 7px; margin: 0 2px; background: #8696a0; border-radius: 50%; animation: blink 1.2s infinite; }
+  .msg.typing span:nth-child(2) { animation-delay: .2s; }
+  .msg.typing span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%, 60%, 100% { opacity: .25; } 30% { opacity: 1; } }
+  .chips { flex: none; background: #f0f2f5; padding: 8px; display: flex; gap: 8px; overflow-x: auto; border-top: 1px solid #d1d7db; }
+  .chips button { flex: none; background: #fff; border: 1px solid #00a884; color: #00755f; border-radius: 18px; padding: 7px 13px; font-size: 13px; cursor: pointer; }
+  .chips button:hover { background: #e7f9f3; }
+  .inputbar { flex: none; background: #f0f2f5; padding: 8px 10px; display: flex; gap: 8px; align-items: center; }
+  .inputbar input { flex: 1; border: none; border-radius: 20px; padding: 10px 14px; font-size: 14px; outline: none; }
+  .inputbar button { width: 42px; height: 42px; border: none; border-radius: 50%; background: #00a884; color: #fff; font-size: 18px; cursor: pointer; flex: none; }
+  .foot { max-width: 420px; width: 100%; color: #8696a0; font-size: 12px; text-align: center; margin-top: 12px; line-height: 1.5; }
+</style>
+</head>
+<body>
+  <div class="demo-banner"><b>Live demo</b> built for Bellance Salon — in production this assistant connects to their WhatsApp and answers customers automatically.</div>
+  <div class="phone">
+    <div class="wa-header">
+      <div class="avatar">BS</div>
+      <div class="who"><div class="bname">Bellance Salon</div><div class="status">online</div></div>
+    </div>
+    <div class="chat" id="chat"></div>
+    <div class="chips" id="chips"></div>
+    <div class="inputbar">
+      <input id="inp" placeholder="Type a message" autocomplete="off">
+      <button id="send" aria-label="Send">&#10148;</button>
+    </div>
+  </div>
+  <p class="foot">Demo preview — replies are automatic. Built as a sample for Bellance Salon.</p>
+
+<script>
+const C = {
+  name: "Bellance Salon",
+  bookNoun: "appointment",
+  greet: "Hi! Welcome to Bellance Salon. I can tell you about our services or book your appointment — what would you like?",
+  priceA: "It depends on the service you pick — tell us what you need while booking and we'll share the exact quote before anything is confirmed.",
+  locA: "We're easy to reach — leave your number in booking and we'll send you the exact location.",
+  hoursA: "Just share your preferred day and time while booking and the team will confirm a slot for you.",
+  fallback: "I didn't quite catch that — I can tell you about our services or book your appointment. Which would you like?",
+  faqs: [
+    { q: "What services do you offer?", k: ["services", "haircut", "facial", "colour", "color", "manicure", "pedicure"],
+      a: "Haircuts, hair colour, facials, clean-ups, manicure-pedicure, waxing, and party makeup — the full salon menu." },
+    { q: "Do you do bridal packages?", k: ["bridal", "wedding", "bride"],
+      a: "Yes, bridal packages are available — share your wedding date while booking and the team will plan everything with you." },
+    { q: "Can I just walk in?", k: ["walk in", "walk-in", "walkin"],
+      a: "Walk-ins are welcome when a chair is free, but booking ahead means zero waiting for you." },
+    { q: "Will you suggest what suits me?", k: ["suggest", "suits", "consultation", "advice", "which style"],
+      a: "Yes — the stylists will look at your hair and face shape and suggest what suits you before starting anything." },
+    { q: "Which products do you use?", k: ["products", "product", "brand"],
+      a: "Only professional salon-grade products — feel free to ask the stylist about anything specific on your visit." },
+    { q: "How do I reschedule?", k: ["reschedule", "postpone", "change my", "move my"],
+      a: "Easy — just message here with your new preferred time and we'll move your appointment." }
+  ]
+};
+
+const chat = document.getElementById('chat');
+const chipsBox = document.getElementById('chips');
+const inp = document.getElementById('inp');
+let step = 'idle', bk = {};
+
+function scrollDown(){ chat.scrollTop = chat.scrollHeight; }
+function esc(s){ const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function bubble(html, who){
+  const d = document.createElement('div');
+  d.className = 'msg ' + who;
+  d.innerHTML = html;
+  chat.appendChild(d); scrollDown();
+}
+function botSay(text, ms){
+  const t = document.createElement('div');
+  t.className = 'msg in typing';
+  t.innerHTML = '<span></span><span></span><span></span>';
+  chat.appendChild(t); scrollDown();
+  setTimeout(function(){ t.remove(); bubble(text, 'in'); }, ms || 700);
+}
+function userMsg(text){
+  const d = document.createElement('div');
+  d.className = 'msg out';
+  d.textContent = text;
+  chat.appendChild(d); scrollDown();
+}
+function norm(s){ return ' ' + s.toLowerCase().trim() + ' '; }
+function has(t, arr){ return arr.some(function(k){ return t.indexOf(k) !== -1; }); }
+
+function startBooking(){
+  step = 'name'; bk = {};
+  botSay("Great — let's book your " + C.bookNoun + ". What's your name? (You can type <i>cancel</i> anytime to stop.)");
+}
+
+function reply(text){
+  const t = norm(text);
+  if (step === 'name'){
+    if (!text.trim()){ botSay("Please tell me your name so I can hold the " + C.bookNoun + "."); return; }
+    bk.name = text.trim(); step = 'phone';
+    botSay("Thanks " + esc(bk.name) + ". What's your phone number so we can confirm?");
+    return;
+  }
+  if (step === 'phone'){
+    const digits = text.replace(/\D/g, '');
+    if (digits.length < 7){ botSay("That doesn't look like a valid number — please share your phone number."); return; }
+    bk.phone = text.trim(); step = 'time';
+    botSay("And your preferred day and time? (for example: tomorrow 5pm)");
+    return;
+  }
+  if (step === 'time'){
+    if (!text.trim()){ botSay("Please share a day and time that works for you."); return; }
+    bk.time = text.trim(); step = 'idle';
+    botSay("Done, " + esc(bk.name) + "! Your " + C.bookNoun + " request is noted for <b>" + esc(bk.time) + "</b>. We'll call <b>" + esc(bk.phone) + "</b> shortly to confirm. Anything else I can help with?");
+    bk = {};
+    return;
+  }
+  if (/\bcancel\b/.test(t)){ botSay("No problem — is there anything else I can help with?"); return; }
+  for (const f of C.faqs){ if (has(t, f.k)){ botSay(f.a); return; } }
+  if (has(t, ['book', 'appointment', 'slot', 'schedule'])){ startBooking(); return; }
+  if (has(t, ['price', 'cost', 'charge', 'rate', 'fee'])){ botSay(C.priceA); return; }
+  if (has(t, ['where', 'address', 'location', 'reach', 'direction'])){ botSay(C.locA); return; }
+  if (has(t, ['hour', 'timing', 'open', 'close'])){ botSay(C.hoursA); return; }
+  if (has(t, ['thank'])){ botSay("You're welcome! Anything else?"); return; }
+  if (has(t, ['bye'])){ botSay("See you soon!"); return; }
+  if (t.trim().length < 14 && has(t, ['hi', 'hello', 'hey', 'namaste'])){ botSay(C.greet); return; }
+  botSay(C.fallback);
+}
+
+function send(){
+  const v = inp.value;
+  if (!v.trim()) return;
+  userMsg(v); inp.value = '';
+  setTimeout(function(){ reply(v); }, 250);
+}
+
+C.faqs.forEach(function(f){
+  const b = document.createElement('button');
+  b.textContent = f.q;
+  b.onclick = function(){ userMsg(f.q); setTimeout(function(){ botSay(f.a); }, 250); };
+  chipsBox.appendChild(b);
+});
+(function(){
+  const b = document.createElement('button');
+  b.textContent = "Book appointment";
+  b.onclick = function(){ userMsg("Book appointment"); setTimeout(startBooking, 250); };
+  chipsBox.appendChild(b);
+})();
+
+document.getElementById('send').onclick = send;
+inp.addEventListener('keydown', function(e){ if (e.key === 'Enter') send(); });
+setTimeout(function(){ botSay(C.greet); }, 500);
+</script>
+</body>
+</html>

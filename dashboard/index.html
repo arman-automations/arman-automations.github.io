@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Arman's Money Machine</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: -apple-system, system-ui, sans-serif; background:#0a0a0f; color:#e0e0e0; padding:16px; max-width:600px; margin:0 auto; }
+h1 { font-size:22px; margin-bottom:4px; }
+.updated { color:#888; font-size:12px; margin-bottom:16px; }
+.cards { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px; }
+.card { background:#15151f; border-radius:12px; padding:16px; }
+.card .num { font-size:28px; font-weight:700; color:#4ade80; }
+.card .label { font-size:12px; color:#888; margin-top:4px; }
+.card.warn .num { color:#fbbf24; }
+h2 { font-size:16px; margin:16px 0 8px; color:#aaa; }
+.agent { background:#15151f; border-radius:10px; padding:12px 14px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; }
+.agent .name { font-weight:600; font-size:14px; }
+.agent .desc { font-size:12px; color:#888; }
+.dot { width:10px; height:10px; border-radius:50%; background:#4ade80; display:inline-block; margin-right:6px; }
+.status { font-size:12px; color:#4ade80; }
+.note { background:#1a1a2e; border-radius:10px; padding:14px; margin-top:16px; font-size:13px; color:#aaa; line-height:1.5; }
+</style>
+</head>
+<body>
+<h1>💰 Money Machine</h1>
+<div class="updated">Updated Sep 27, 10:40 PM IST</div>
+
+<div class="cards">
+<div class="card"><div class="num">$0</div><div class="label">Revenue</div></div>
+<div class="card"><div class="num">25/15</div><div class="label">Emails sent today</div></div>
+<div class="card"><div class="num">15</div><div class="label">Emails queued</div></div>
+<div class="card"><div class="num">11+</div><div class="label">Leads in sheet</div></div>
+</div>
+
+<h2>🤖 Automations</h2>
+<div class="agent">
+<div><div class="name">CLOSER</div><div class="desc">Email machine — 15 queued for Sep 28 9am</div></div>
+<div class="status"><span class="dot"></span>Running</div>
+</div>
+<div class="agent">
+<div><div class="name">HUNTER</div><div class="desc">Upwork + Freelancer — Next: Sep 28 9:49am</div></div>
+<div class="status"><span class="dot"></span>Running</div>
+</div>
+<div class="agent">
+<div><div class="name">SCOUT</div><div class="desc">Reddit radar — 0 hits today</div></div>
+<div class="status"><span class="dot"></span>Running</div>
+</div>
+<div class="agent">
+<div><div class="name">DIGGER</div><div class="desc">Instagram — 10 drafts ready</div></div>
+<div class="status"><span class="dot"></span>Running</div>
+</div>
+<div class="agent">
+<div><div class="name">MAKER</div><div class="desc">Template pack — 12/12 valid</div></div>
+<div class="status"><span class="dot"></span>Running</div>
+</div>
+<div class="agent">
+<div><div class="name">FINDER</div><div class="desc">Opportunity radar — 2 hot signals</div></div>
+<div class="status"><span class="dot"></span>Running</div>
+</div>
+<div class="agent">
+<div><div class="name">Lead Finder</div><div class="desc">n8n worldwide — Daily, 12 cities</div></div>
+<div class="status"><span class="dot"></span>Running</div>
+</div>
+<div class="agent">
+<div><div class="name">Auto-Responder</div><div class="desc">n8n webhook — 100% success</div></div>
+<div class="status"><span class="dot"></span>Running</div>
+</div>
+<div class="note">
+<b>Mission:</b> $2,000 by Oct 10 (floor $1,000)<br>
+<b>Replies:</b> 0 so far — numbers update here daily.<br>
+<b>Questions?</b> Just ask Muse in chat — "how many leads today?" etc.
+</div>
+</body>
+</html>
